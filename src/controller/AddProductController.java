@@ -25,9 +25,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
-import model.InHouse;
 import model.Inventory;
-import model.Outsourced;
 import model.Part;
 import model.Product;
 
@@ -37,10 +35,10 @@ import model.Product;
  * @author Vladan
  */
 public class AddProductController implements Initializable {
-    
+
     Stage stage;
     Parent scene;
-    
+
     @FXML
     private TextField addProductIdTxt;
 
@@ -91,23 +89,21 @@ public class AddProductController implements Initializable {
 
     @FXML
     private TableColumn<Part, Double> delPricePerUnitCol;
-    
+
     private int count;
     private Part selectedPart;
     Product newProduct;
     private static ObservableList<Part> partsToTransfer = FXCollections.observableArrayList();
-    
-    
+
     /*
     The fallowing methods will handle buttons on AddProduct screen
-    */
-    
+     */
     @FXML
     void onActionAddProduct(ActionEvent event) {
-   
+
         selectedPart = addTableView.getSelectionModel().getSelectedItem();
         partsToTransfer.add(selectedPart);
-        if(selectedPart == null) {
+        if (selectedPart == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
             alert.setContentText("Please select part to add.");
             alert.showAndWait();
@@ -118,82 +114,93 @@ public class AddProductController implements Initializable {
             delInventroyLevelCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
             delPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
         }
-       
+
     }
 
     @FXML
     void onActionDeleteAddProduct(ActionEvent event) {
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setContentText("Are you sure you want to delete selected item?");
         Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK){
+        if (result.get() == ButtonType.OK) {
             int selectedItem = deleteTableView.getSelectionModel().getSelectedIndex();
             deleteTableView.getItems().remove(selectedItem);
         }
     }
-    
+
     // This method will go back to the main screen
     @FXML
     void onActionExitToMainScreen(ActionEvent event) throws IOException {
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setContentText("Please confirm to exit to the main screen!");
         Optional<ButtonType> choice = alert.showAndWait();
-        
-        if(choice.get() == ButtonType.OK) {
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+
+        if (choice.get() == ButtonType.OK) {
+            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
             scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
             stage.setScene(new Scene(scene));
             stage.show();
         }
-        
+
     }
-    
+
     // This method will save modification and exit to the Main Screen
     @FXML
     void onActionSaveAndExit(ActionEvent event) throws IOException {
-        
-        String name = addProductNameTxt.getText();
-        int inventoryStock = Integer.parseInt(addProductInvTxt.getText());
-        double price = Double.parseDouble(addProductPriceTxt.getText());
-        int max = Integer.parseInt(addProductMaxTxt.getText());
-        int min = Integer.parseInt(addProductMinTxt.getText());
-        
-        Product newProduct = new Product(count, name, price, inventoryStock, max, min); 
-        Inventory.addProduct(newProduct);
-        
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Please confirm that you want to add the Product to Inventory!");
-        Optional<ButtonType> choice = alert.showAndWait();
-        
-        if(choice.get() == ButtonType.OK){
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
+        try {
+            String name = addProductNameTxt.getText();
+            int inventoryStock = Integer.parseInt(addProductInvTxt.getText());
+            double price = Double.parseDouble(addProductPriceTxt.getText());
+            int max = Integer.parseInt(addProductMaxTxt.getText());
+            int min = Integer.parseInt(addProductMinTxt.getText());
 
+            if (min > max) {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setContentText("Min value cannot be higher than max!");
+                alert.showAndWait();
+            } else {
+
+                Product newProduct = new Product(count, name, price, inventoryStock, max, min);
+                Inventory.addProduct(newProduct);
+
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setContentText("Please confirm that you want to add the Product to Inventory!");
+                Optional<ButtonType> choice = alert.showAndWait();
+
+                if (choice.get() == ButtonType.OK) {
+                    stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                    scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
+                    stage.setScene(new Scene(scene));
+                    stage.show();
+
+                }
+            }
+        } catch (NumberFormatException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Error adding a product. Please correct it and try again!");
+            alert.showAndWait();
         }
+
     }
-        
 
     @FXML
     void onActionSearchAddProduct(ActionEvent event) {
         String searchPartField = addProductSearchTxt.getText();
         ObservableList searchedPart = Inventory.lookupPart(searchPartField);
-        if (searchedPart.isEmpty()){
+        if (searchedPart.isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("No part was found matching your criteria!");
             alert.showAndWait();
-        }
-        else{
+        } else {
             addTableView.setItems(searchedPart);
             addPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
             addPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
             addInventoryLevelCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
             addPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
 
-        } 
+        }
     }
 
     /**
@@ -204,11 +211,10 @@ public class AddProductController implements Initializable {
         // TODO
         addProductIdTxt.setText("Auto Gen - Disabled");
         addProductIdTxt.setDisable(true);
-        
+
         // setup auto generate Product ID
-        
         count = Inventory.handleProductIdCount();
         addProductIdTxt.setText(Integer.toString(count));
-    }    
-    
+    }
+
 }
