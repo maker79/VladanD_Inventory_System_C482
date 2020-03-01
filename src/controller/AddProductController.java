@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,6 +23,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.InHouse;
 import model.Inventory;
@@ -90,6 +93,10 @@ public class AddProductController implements Initializable {
     private TableColumn<Part, Double> delPricePerUnitCol;
     
     private int count;
+    private Part selectedPart;
+    Product newProduct;
+    private static ObservableList<Part> partsToTransfer = FXCollections.observableArrayList();
+    
     
     /*
     The fallowing methods will handle buttons on AddProduct screen
@@ -97,12 +104,33 @@ public class AddProductController implements Initializable {
     
     @FXML
     void onActionAddProduct(ActionEvent event) {
-
+   
+        selectedPart = addTableView.getSelectionModel().getSelectedItem();
+        partsToTransfer.add(selectedPart);
+        if(selectedPart == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Please select part to add.");
+            alert.showAndWait();
+        } else {
+            deleteTableView.setItems(partsToTransfer);
+            delPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
+            delPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
+            delInventroyLevelCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
+            delPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
+        }
+       
     }
 
     @FXML
     void onActionDeleteAddProduct(ActionEvent event) {
-
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setContentText("Are you sure you want to delete selected item?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.get() == ButtonType.OK){
+            int selectedItem = deleteTableView.getSelectionModel().getSelectedIndex();
+            deleteTableView.getItems().remove(selectedItem);
+        }
     }
     
     // This method will go back to the main screen
@@ -133,7 +161,6 @@ public class AddProductController implements Initializable {
         int min = Integer.parseInt(addProductMinTxt.getText());
         
         Product newProduct = new Product(count, name, price, inventoryStock, max, min); 
-            
         Inventory.addProduct(newProduct);
         
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -152,7 +179,21 @@ public class AddProductController implements Initializable {
 
     @FXML
     void onActionSearchAddProduct(ActionEvent event) {
+        String searchPartField = addProductSearchTxt.getText();
+        ObservableList searchedPart = Inventory.lookupPart(searchPartField);
+        if (searchedPart.isEmpty()){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("No part was found matching your criteria!");
+            alert.showAndWait();
+        }
+        else{
+            addTableView.setItems(searchedPart);
+            addPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
+            addPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
+            addInventoryLevelCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
+            addPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
 
+        } 
     }
 
     /**
