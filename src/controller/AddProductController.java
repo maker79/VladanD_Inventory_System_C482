@@ -155,6 +155,8 @@ public class AddProductController implements Initializable {
             double price = Double.parseDouble(addProductPriceTxt.getText());
             int max = Integer.parseInt(addProductMaxTxt.getText());
             int min = Integer.parseInt(addProductMinTxt.getText());
+            
+            
 
             if (min > max) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
@@ -163,6 +165,7 @@ public class AddProductController implements Initializable {
             } else {
 
                 Product newProduct = new Product(count, name, price, inventoryStock, max, min);
+                newProduct.setAssociatedParts(deleteTableView.getItems());
                 Inventory.addProduct(newProduct);
 
                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -179,7 +182,7 @@ public class AddProductController implements Initializable {
             }
         } catch (NumberFormatException e) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("Error adding a product. Please correct it and try again!");
+            alert.setContentText("Some or all fields are empty.\nPlease correct it and try again!");
             alert.showAndWait();
         }
 
@@ -215,6 +218,12 @@ public class AddProductController implements Initializable {
         // setup auto generate Product ID
         count = Inventory.handleProductIdCount();
         addProductIdTxt.setText(Integer.toString(count));
+        
+        addTableView.setItems(Inventory.getAllParts());
+        addPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
+        addPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
+        addInventoryLevelCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
+        addPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
     }
 
 }

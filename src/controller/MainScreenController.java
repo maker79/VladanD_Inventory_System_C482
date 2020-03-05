@@ -29,6 +29,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.InHouse;
 import model.Inventory;
+import static model.Inventory.getAllParts;
+import static model.Inventory.getAllProducts;
 import static model.Inventory.updatePart;
 import model.Outsourced;
 import model.Part;
@@ -83,6 +85,26 @@ public class MainScreenController implements Initializable {
     @FXML
     private TableColumn<Product, Double> productPricePerUnitCol;
     
+    private static Product selectedProduct;
+    private static int indexOfSelectedProduct;
+    private static Part selectedPart;
+    private static int indexOfSelectedPart;
+    
+    public static Part getSelectedPart(){
+        return selectedPart;
+    }
+    
+    public static int getSelectedPartIndex(){
+        return indexOfSelectedPart;
+    }
+    
+    public static Product getSelectedProduct(){
+        return selectedProduct;
+    }
+    
+    public static int getSelectedProducutIndex(){
+        return indexOfSelectedProduct;
+    }
     
     /*
     * The fallowing methods will be handling when buutons are clicked on the main screen
@@ -162,6 +184,20 @@ public class MainScreenController implements Initializable {
     // This method will change to Modify parts screen and pass selected part
     @FXML
     void onActionHandleModifyParts(ActionEvent event) throws IOException {
+        
+        selectedPart = partsTableView.getSelectionModel().getSelectedItem();
+        indexOfSelectedPart = getAllParts().indexOf(selectedPart);
+//        if(selectedPart == null){
+//            Alert alert = new Alert(Alert.AlertType.WARNING);
+//            alert.setContentText("No part was selected to be modified!");
+//            alert.showAndWait();
+//        } else {
+//            Parent modifyPartScreen = FXMLLoader.load(getClass().getResource("/view/ModifyPart.fxml"));
+//            Scene modifyProductScene = new Scene(modifyPartScreen);
+//            Stage windowPartMod = (Stage) ((Node)event.getSource()).getScene().getWindow();
+//            windowPartMod.setScene(modifyProductScene);
+//            windowPartMod.show();
+//        }
             
         FXMLLoader loader = new FXMLLoader();
         loader.setLocation(getClass().getResource("/view/ModifyPart.fxml"));
@@ -188,30 +224,45 @@ public class MainScreenController implements Initializable {
     @FXML
     void onActionHandleModifyProduct(ActionEvent event) throws IOException {
         
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/view/ModifyProduct.fxml"));
-        Parent modifyProductPage = loader.load();
-        Scene modifyProductScene = new Scene(modifyProductPage);
+        selectedProduct = productsTableView.getSelectionModel().getSelectedItem();
+        indexOfSelectedProduct = getAllProducts().indexOf(selectedProduct);
         
-        // access the controller and call a method
-        ModifyProductController controller = loader.getController();
-        if((productsTableView.getSelectionModel().getSelectedItem()) instanceof Product) 
-            controller.initDataProduct((productsTableView.getSelectionModel().getSelectedItem()));
-        else {
+        if(selectedProduct == null){
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("Please enter a Product to modify");
-            Optional<ButtonType> choice = alert.showAndWait();
-            
-            if(choice.get() == ButtonType.OK) {
-                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-                scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
-                stage.setScene(new Scene(scene));
-                stage.show();
-            }
+            alert.setContentText("No product was selected to be modified!");
+            alert.showAndWait();
+        } else {
+            Parent modifyProductScreen = FXMLLoader.load(getClass().getResource("/view/ModifyProduct.fxml"));
+            Scene modifyProductScene = new Scene(modifyProductScreen);
+            Stage windowProductMod = (Stage) ((Node)event.getSource()).getScene().getWindow();
+            windowProductMod.setScene(modifyProductScene);
+            windowProductMod.show();
         }
-        Stage applicationStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        applicationStage.setScene(modifyProductScene);
-        applicationStage.show();
+        
+//        FXMLLoader loader = new FXMLLoader();
+//        loader.setLocation(getClass().getResource("/view/ModifyProduct.fxml"));
+//        Parent modifyProductPage = loader.load();
+//        Scene modifyProductScene = new Scene(modifyProductPage);
+//        
+//        // access the controller and call a method
+//        ModifyProductController controller = loader.getController();
+//        if((productsTableView.getSelectionModel().getSelectedItem()) instanceof Product) 
+//            controller.initDataProduct((productsTableView.getSelectionModel().getSelectedItem()));
+//        else {
+//            Alert alert = new Alert(Alert.AlertType.WARNING);
+//            alert.setContentText("Please enter a Product to modify");
+//            Optional<ButtonType> choice = alert.showAndWait();
+//            
+//            if(choice.get() == ButtonType.OK) {
+//                stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+//                scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
+//                stage.setScene(new Scene(scene));
+//                stage.show();
+//            }
+//        }
+//        Stage applicationStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+//        applicationStage.setScene(modifyProductScene);
+//        applicationStage.show();
         
     }
     
@@ -222,10 +273,8 @@ public class MainScreenController implements Initializable {
         String searchedPart = partsSearchTxt.getText();
         ObservableList<Part> foundParts = Inventory.lookupPart(searchedPart);
         
-        if(foundParts.isEmpty()){
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("Please enter item in a search box!");
-            alert.showAndWait();
+        if(searchedPart.isEmpty()){
+            partsTableView.setItems(Inventory.getAllParts());
         } else {
             partsTableView.setItems(foundParts);
         }
@@ -247,10 +296,6 @@ public class MainScreenController implements Initializable {
             productsTableView.setItems(foundProducts);
         }
     }
-    
-//    public void setPartToModify(Part partToModify){
-//        controller.MainScreenController.partToModify = partToModify;
-//    }
     
    
     

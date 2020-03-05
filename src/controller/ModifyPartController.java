@@ -5,6 +5,8 @@
  */
 package controller;
 
+import static controller.MainScreenController.getSelectedPart;
+import static controller.MainScreenController.getSelectedPartIndex;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
@@ -104,6 +106,7 @@ public class ModifyPartController implements Initializable {
         double price = Double.parseDouble(modifyPartPriceTxt.getText());
         int max = Integer.parseInt(modifyPartMaxTxt.getText());
         int min = Integer.parseInt(modifyPartMinTxt.getText());
+        index = getSelectedPartIndex();
         
         if(modifyPartInHouseRbtn.isSelected()){
             int machineId = Integer.parseInt(modifyPartMachIdTxt.getText());
@@ -115,7 +118,7 @@ public class ModifyPartController implements Initializable {
             Inventory.updatePart(index, modifiedOutsourced);
         }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Please confirm to modify the part!");
+        alert.setContentText("Please confirm you want to modify the selected part!");
         Optional<ButtonType> choice = alert.showAndWait();
         
         if(choice.get() == ButtonType.OK){
@@ -139,6 +142,7 @@ public class ModifyPartController implements Initializable {
         modifyPartMachIdTxt.setText(Integer.toString(selectedInHousePart.getMachineId()));
         modifyMachIdCompNameLbl.setText("Machine ID");
         modifyPartInHouseRbtn.setSelected(true);
+        modifyPartIdTxt.setDisable(true);
     }
     
     public void initDataOutsourced(Outsourced part){
@@ -152,6 +156,7 @@ public class ModifyPartController implements Initializable {
         modifyPartMachIdTxt.setText(selectedOutsourcedPart.getCompanyName());
         modifyMachIdCompNameLbl.setText("Company Name");
         modifyPartOutsourcedRbtn.setSelected(true);
+        modifyPartIdTxt.setDisable(true);
         
     }
 

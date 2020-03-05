@@ -165,6 +165,7 @@ public class AddPartController implements Initializable {
         // setup auto generated Part ID
         count = Inventory.handlePartIdCount();
         addPartIdTxt.setText(Integer.toString(count));
+        
 
     }
 
