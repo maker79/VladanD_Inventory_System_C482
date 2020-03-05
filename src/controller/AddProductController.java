@@ -164,7 +164,7 @@ public class AddProductController implements Initializable {
                 alert.showAndWait();
             } else {
 
-                Product newProduct = new Product(count, name, price, inventoryStock, max, min);
+                Product newProduct = new Product(count, name, price, inventoryStock, min, max);
                 newProduct.setAssociatedParts(deleteTableView.getItems());
                 Inventory.addProduct(newProduct);
 

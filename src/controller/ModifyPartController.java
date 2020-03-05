@@ -109,12 +109,14 @@ public class ModifyPartController implements Initializable {
         index = getSelectedPartIndex();
         
         if(modifyPartInHouseRbtn.isSelected()){
+            inHouseModifiedButtonClicked();
             int machineId = Integer.parseInt(modifyPartMachIdTxt.getText());
-            InHouse modifiedInHouse = new InHouse(id, name, price, inventoryStock, max, min, machineId);
+            InHouse modifiedInHouse = new InHouse(id, name, price, inventoryStock, min, max, machineId);
             Inventory.updatePart(index, modifiedInHouse);
         } else {
+            outsourcedButtonClicked();
             String companyName = modifyPartMachIdTxt.getText();
-            Outsourced modifiedOutsourced = new Outsourced(id, name, price, inventoryStock, max, min, companyName); 
+            Outsourced modifiedOutsourced = new Outsourced(id, name, price, inventoryStock, min, max, companyName); 
             Inventory.updatePart(index, modifiedOutsourced);
         }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
@@ -158,6 +160,14 @@ public class ModifyPartController implements Initializable {
         modifyPartOutsourcedRbtn.setSelected(true);
         modifyPartIdTxt.setDisable(true);
         
+    }
+    
+    public void inHouseModifiedButtonClicked(){
+        modifyMachIdCompNameLbl.setText("Machine ID");
+    }
+    
+    public void outsourcedButtonClicked(){
+        modifyMachIdCompNameLbl.setText("Company Name");
     }
 
     /**

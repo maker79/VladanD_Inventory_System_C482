@@ -97,11 +97,11 @@
       </HBox>
       <HBox alignment="CENTER_LEFT" layoutX="196.0" prefHeight="72.0" prefWidth="404.0" spacing="20.0">
          <children>
-            <RadioButton fx:id="modifyPartInHouseRbtn" mnemonicParsing="false" text="In-House">
+            <RadioButton fx:id="modifyPartInHouseRbtn" mnemonicParsing="false" onAction="#inHouseModifiedButtonClicked" text="In-House">
                <toggleGroup>
                   <ToggleGroup fx:id="modifyPartTg" />
                </toggleGroup></RadioButton>
-            <RadioButton fx:id="modifyPartOutsourcedRbtn" mnemonicParsing="false" text="Outsourced" toggleGroup="$modifyPartTg" />
+            <RadioButton fx:id="modifyPartOutsourcedRbtn" mnemonicParsing="false" onAction="#outsourcedButtonClicked" text="Outsourced" toggleGroup="$modifyPartTg" />
          </children>
       </HBox>
    </children>
