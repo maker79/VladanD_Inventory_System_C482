@@ -54,7 +54,7 @@ public class Inventory {
     
     // This method will loop through observable list and look up Parts by Name
     public static ObservableList<Part> lookupPart(String partName){
-        
+        lookedupParts.clear();
         for(int i = 0; i < allParts.size(); i++){
             Part p = allParts.get(i);
             
@@ -67,7 +67,7 @@ public class Inventory {
     
     // This method will loop through observable list and look up Products by Name
     public static ObservableList<Product> lookupProduct(String productName){
-        
+        lookedupProducts.clear();
         for(int i = 0; i < allProducts.size(); i++){
             Product pr = allProducts.get(i);
             

@@ -94,7 +94,7 @@ public class AddProductController implements Initializable {
     private int count;
     private Part selectedPart;
     Product newProduct;
-    private static ObservableList<Part> partsToTransfer = FXCollections.observableArrayList();
+    private ObservableList<Part> partsToTransfer = FXCollections.observableArrayList();
 
     /*
     The fallowing methods will handle buttons on AddProduct screen
@@ -120,14 +120,22 @@ public class AddProductController implements Initializable {
 
     @FXML
     void onActionDeleteAddProduct(ActionEvent event) {
+        int selectedItem = deleteTableView.getSelectionModel().getSelectedIndex();
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Are you sure you want to delete selected item?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            int selectedItem = deleteTableView.getSelectionModel().getSelectedIndex();
-            deleteTableView.getItems().remove(selectedItem);
+        if (selectedItem >= 0) {
+
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Are you sure you want to delete selected item?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
+                deleteTableView.getItems().remove(selectedItem);
+            }
+        } else {
+            Alert alert1 = new Alert(Alert.AlertType.WARNING);
+            alert1.setContentText("No item was selected!");
+            alert1.showAndWait();
         }
+
     }
 
     // This method will go back to the main screen
@@ -156,12 +164,10 @@ public class AddProductController implements Initializable {
             double price = Double.parseDouble(addProductPriceTxt.getText());
             int max = Integer.parseInt(addProductMaxTxt.getText());
             int min = Integer.parseInt(addProductMinTxt.getText());
-            
-            
 
-            if (min > max) {
+            if ((min > max) || (max > inventoryStock)) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setContentText("Min value cannot be higher than max!");
+                alert.setContentText("Min value cannot be higher than max!\nOr max cannot be higher than inv");
                 alert.showAndWait();
             } else {
 
@@ -193,15 +199,16 @@ public class AddProductController implements Initializable {
     void onActionSearchAddProduct(ActionEvent event) {
         String searchPartField = addProductSearchTxt.getText();
         ObservableList searchedPart = Inventory.lookupPart(searchPartField);
-        
-//        if(searchedPart.size() == 0){
-//            int id = Integer.parseInt(searchPartField);
-//            Part part = lookupPart(id);
-//            
-//            if(part != null)
-//                searchedPart.add(part);
-//    }  
-        
+
+        if (searchedPart.size() == 0) {
+            int id = Integer.parseInt(searchPartField);
+            Part part = (Part) lookupPart(id);
+
+            if (part != null) {
+                searchedPart.add(part);
+            }
+        }
+
         addTableView.setItems(searchedPart);
 
     }
@@ -218,7 +225,7 @@ public class AddProductController implements Initializable {
         // setup auto generate Product ID
         count = Inventory.handleProductIdCount();
         addProductIdTxt.setText(Integer.toString(count));
-        
+
         addTableView.setItems(Inventory.getAllParts());
         addPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
         addPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));

@@ -96,8 +96,8 @@ public class ModifyProductController implements Initializable {
     @FXML
     private TableColumn<Part, Double> pricePerUnitDeleteCol;
 
-    private static ObservableList<Part> associatedParts = FXCollections.observableArrayList();
-    private static ObservableList<Part> partToTransfer = FXCollections.observableArrayList();
+    private ObservableList<Part> associatedParts = FXCollections.observableArrayList();
+    private ObservableList<Part> partToTransfer = FXCollections.observableArrayList();
     Product product;
 
     /*
@@ -106,37 +106,36 @@ public class ModifyProductController implements Initializable {
     @FXML
     void onActionAddModifyProduct(ActionEvent event) {
 
-//        selectedPart = modifyProductAddTableView.getSelectionModel().getSelectedItem();
-//        partToTransfer.add(selectedPart);
-//        if(selectedPart == null) {
-//            Alert alert = new Alert(Alert.AlertType.WARNING);
-//            alert.setContentText("Please select part to add.");
-//            alert.showAndWait();
-//        } else {
-//            selectedProduct.getAllAssociatedParts().add(selectedPart);
-//            modifyProductDeleteTableView.setItems(partToTransfer);
-////            modifyProductDeleteTableView.setItems(partToTransfer);
-//            partIdDeleteCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
-//            partNameDelCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
-//            inventoryLevelDeleteCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
-//            pricePerUnitDeleteCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
-//        }
         Part selectedPart = modifyProductAddTableView.getSelectionModel().getSelectedItem();
-        associatedParts.add(selectedPart);
-        updateLowerTableView();
+
+        if (selectedPart == null) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Please select product to add.");
+            alert.showAndWait();
+        } else {
+            associatedParts.add(selectedPart);
+            updateLowerTableView();
+        }
     }
 
     @FXML
     void onActionDeleteModifyProduct(ActionEvent event) {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Are you sure you want to delete selected item?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            int selectedItem = modifyProductDeleteTableView.getSelectionModel().getSelectedIndex();
-            if (selectedItem >= 0) {
+        int selectedItem = modifyProductDeleteTableView.getSelectionModel().getSelectedIndex();
+        
+        if (selectedItem >= 0) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Are you sure you want to delete selected item?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
                 modifyProductDeleteTableView.getItems().remove(selectedItem);
             }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("No item was selected!");
+            alert.showAndWait();
+        }
+        {
+
         }
     }
 
@@ -193,14 +192,14 @@ public class ModifyProductController implements Initializable {
         String searchedPartField = modifyProcuctSearchTxt.getText();
         ObservableList<Part> searchedPart = Inventory.lookupPart(searchedPartField);
 
-//        if (searchedPart.size() == 0) {
-//            String id = modifyProcuctSearchTxt.getId();
-//            Part part = (Part) lookupPart(id);
-//
-//            if (part != null) {
-//                searchedPart.add(part);
-//            }
-//        }
+        if (searchedPart.size() == 0) {
+            String id = modifyProcuctSearchTxt.getId();
+            Part part = (Part) lookupPart(id);
+
+            if (part != null) {
+                searchedPart.add(part);
+            }
+        }
         modifyProductAddTableView.setItems(searchedPart);
     }
 
@@ -219,7 +218,6 @@ public class ModifyProductController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
 
-
         Product selectedProduct = getSelectedProduct();
 
         modifyProductIdTxt.setText(Integer.toString(selectedProduct.getProductId()));
@@ -230,7 +228,7 @@ public class ModifyProductController implements Initializable {
         modifyProductMaxTxt.setText(Integer.toString(selectedProduct.getProductMax()));
         modifyProductMinTxt.setText(Integer.toString(selectedProduct.getProductMin()));
 
-        associatedParts = selectedProduct.getAllAssociatedParts();
+        associatedParts.addAll(selectedProduct.getAllAssociatedParts());
 
         partIdAddCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
         partNameAddCol.setCellValueFactory(new PropertyValueFactory<>("partName"));

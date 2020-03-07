@@ -133,29 +133,38 @@ public class MainScreenController implements Initializable {
 
     @FXML
     void onActionHandleDeleteParts(ActionEvent event) {
+        int selectedItem = partsTableView.getSelectionModel().getSelectedIndex();
 
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Please confirm to delete selected item?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            int selectedItem = partsTableView.getSelectionModel().getSelectedIndex();
-            if (selectedItem >= 0) {
+        if (selectedItem >= 0) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Please confirm to delete selected item?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
                 partsTableView.getItems().remove(selectedItem);
             }
+        } else {
+
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Select part to delete!");
+            alert.showAndWait();
         }
     }
 
     @FXML
     void onActionHandleDeleteProduct(ActionEvent event) {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Please confirm to delete selected item?");
-        Optional<ButtonType> result = alert.showAndWait();
-        if (result.get() == ButtonType.OK) {
-            int selectedItem = productsTableView.getSelectionModel().getSelectedIndex();
-            if (selectedItem >= 0) {
+        int selectedItem = productsTableView.getSelectionModel().getSelectedIndex();
+        
+        if (selectedItem >= 0) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Please confirm to delete selected item?");
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) {
                 productsTableView.getItems().remove(selectedItem);
             }
+        } else {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Select product to delete!");
+            alert.showAndWait();
         }
 
     }
@@ -180,22 +189,28 @@ public class MainScreenController implements Initializable {
         selectedPart = partsTableView.getSelectionModel().getSelectedItem();
         indexOfSelectedPart = getAllParts().indexOf(selectedPart);
 
-        FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(getClass().getResource("/view/ModifyPart.fxml"));
-        Parent modifyPartPage = loader.load();
-        Scene modifyPartScene = new Scene(modifyPartPage);
+        try {
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/view/ModifyPart.fxml"));
+            Parent modifyPartPage = loader.load();
+            Scene modifyPartScene = new Scene(modifyPartPage);
 
-        // access the controller and call a method
-        ModifyPartController controller = loader.getController();
-        if ((partsTableView.getSelectionModel().getSelectedItem()) instanceof InHouse) {
-            controller.initDataInHouse((InHouse) (partsTableView.getSelectionModel().getSelectedItem()));
-        } else {
-            controller.initDataOutsourced((Outsourced) partsTableView.getSelectionModel().getSelectedItem());
+            // access the controller and call a method
+            ModifyPartController controller = loader.getController();
+            if ((partsTableView.getSelectionModel().getSelectedItem()) instanceof InHouse) {
+                controller.initDataInHouse((InHouse) (partsTableView.getSelectionModel().getSelectedItem()));
+            } else {
+                controller.initDataOutsourced((Outsourced) partsTableView.getSelectionModel().getSelectedItem());
+            }
+
+            Stage applicationStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+            applicationStage.setScene(modifyPartScene);
+            applicationStage.show();
+        } catch (NullPointerException e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Please select a part to modify!");
+            alert.showAndWait();
         }
-
-        Stage applicationStage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        applicationStage.setScene(modifyPartScene);
-        applicationStage.show();
 
     }
 
@@ -208,7 +223,7 @@ public class MainScreenController implements Initializable {
 
         if (selectedProduct == null) {
             Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setContentText("No product was selected to be modified!");
+            alert.setContentText("Please select a product to modify!");
             alert.showAndWait();
         } else {
             Parent modifyProductScreen = FXMLLoader.load(getClass().getResource("/view/ModifyProduct.fxml"));
@@ -227,19 +242,19 @@ public class MainScreenController implements Initializable {
         String searchedPart = partsSearchTxt.getText();
         ObservableList<Part> foundParts = Inventory.lookupPart(searchedPart);
 
-//        if (foundParts.size() == 0) {
-//            try {
-//                int id = Integer.parseInt(searchedPart);
-//                Part part = lookupPart(id);
-//
-//                if (part != null) {
-//                    foundParts.add(part);
-//                }
-//            } catch (NumberFormatException e) {
-//                //ignore
-//            }
-//
-//        }
+        if (foundParts.size() == 0) {
+            try {
+                int id = Integer.parseInt(searchedPart);
+                Part part = lookupPart(id);
+
+                if (part != null) {
+                    foundParts.add(part);
+                }
+            } catch (NumberFormatException e) {
+                //ignore
+            }
+
+        }
         partsTableView.setItems(foundParts);
     }
 
@@ -250,20 +265,20 @@ public class MainScreenController implements Initializable {
         String searchedProduct = productsSearchTxt.getText();
         ObservableList<Product> foundProducts = Inventory.lookupProduct(searchedProduct);
 
-//        if (foundProducts.size() == 0) {
-//
-//            try {
-//                int id = Integer.parseInt(searchedProduct);
-//                Product product = lookupProduct(id);
-//
-//                if (product != null) {
-//                    foundProducts.add(product);
-//                }
-//            } catch (NumberFormatException e) {
-//                // ignore
-//            }
-//
-//        }
+        if (foundProducts.size() == 0) {
+
+            try {
+                int id = Integer.parseInt(searchedProduct);
+                Product product = lookupProduct(id);
+
+                if (product != null) {
+                    foundProducts.add(product);
+                }
+            } catch (NumberFormatException e) {
+                // ignore
+            }
+
+        }
         productsTableView.setItems(foundProducts);
     }
 

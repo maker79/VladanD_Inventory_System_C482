@@ -105,9 +105,9 @@ public class AddPartController implements Initializable {
             int max = Integer.parseInt(addPartMaxTxt.getText());
             int min = Integer.parseInt(addPartMinTxt.getText());
 
-            if (min > max) {
+            if ((min > max)||(max > inventoryStock)) {
                 Alert alert = new Alert(Alert.AlertType.WARNING);
-                alert.setContentText("Min value cannot be higher than max!");
+                alert.setContentText("Min value cannot be higher than max!\nOr max cannot be higher than inv!");
                 alert.showAndWait();
             } else {
                 if (addPartInHouseRbtn.isSelected()) {
