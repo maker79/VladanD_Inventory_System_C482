@@ -26,6 +26,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.Inventory;
+import static model.Inventory.lookupPart;
 import model.Part;
 import model.Product;
 
@@ -192,18 +193,17 @@ public class AddProductController implements Initializable {
     void onActionSearchAddProduct(ActionEvent event) {
         String searchPartField = addProductSearchTxt.getText();
         ObservableList searchedPart = Inventory.lookupPart(searchPartField);
-        if (searchedPart.isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setContentText("No part was found matching your criteria!");
-            alert.showAndWait();
-        } else {
-            addTableView.setItems(searchedPart);
-            addPartIdCol.setCellValueFactory(new PropertyValueFactory<>("partId"));
-            addPartNameCol.setCellValueFactory(new PropertyValueFactory<>("partName"));
-            addInventoryLevelCol.setCellValueFactory(new PropertyValueFactory<>("partStock"));
-            addPricePerUnitCol.setCellValueFactory(new PropertyValueFactory<>("partPrice"));
+        
+//        if(searchedPart.size() == 0){
+//            int id = Integer.parseInt(searchPartField);
+//            Part part = lookupPart(id);
+//            
+//            if(part != null)
+//                searchedPart.add(part);
+//    }  
+        
+        addTableView.setItems(searchedPart);
 
-        }
     }
 
     /**

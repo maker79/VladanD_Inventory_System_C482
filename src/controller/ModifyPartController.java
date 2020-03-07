@@ -35,13 +35,13 @@ import model.Part;
  * @author Vladan
  */
 public class ModifyPartController implements Initializable {
-    
+
     Stage stage;
     Parent scene;
-    
+
     private InHouse selectedInHousePart;
     private Outsourced selectedOutsourcedPart;
-    
+
     @FXML
     private TextField modifyPartIdTxt;
 
@@ -71,35 +71,32 @@ public class ModifyPartController implements Initializable {
 
     @FXML
     private RadioButton modifyPartOutsourcedRbtn;
-    
+
     private static int index;
-   
-    
-    
+
     /*
     The fallowing methods will handle Save and Cancel button
-    */
-    
+     */
     // This method will go back to the Main Screen
-     @FXML
+    @FXML
     void onActionExitToMainScreen(ActionEvent event) throws IOException {
-        
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setContentText("Please Click OK to go back to the Main Screen!");
         Optional<ButtonType> choice = alert.showAndWait();
-        
-        if(choice.get() == ButtonType.OK){
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
+
+        if (choice.get() == ButtonType.OK) {
+            stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
             scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
             stage.setScene(new Scene(scene));
-            stage.show(); 
+            stage.show();
         }
     }
-    
+
     // This method will save modification for a part and exit to Main Screen
     @FXML
     void onActionModifyPartAndExit(ActionEvent event) throws IOException {
-        
+
         int id = Integer.parseInt(modifyPartIdTxt.getText());
         String name = modifyPartNameTxt.getText();
         int inventoryStock = Integer.parseInt(modifyPartInvTxt.getText());
@@ -107,33 +104,41 @@ public class ModifyPartController implements Initializable {
         int max = Integer.parseInt(modifyPartMaxTxt.getText());
         int min = Integer.parseInt(modifyPartMinTxt.getText());
         index = getSelectedPartIndex();
-        
-        if(modifyPartInHouseRbtn.isSelected()){
-            inHouseModifiedButtonClicked();
-            int machineId = Integer.parseInt(modifyPartMachIdTxt.getText());
-            InHouse modifiedInHouse = new InHouse(id, name, price, inventoryStock, min, max, machineId);
-            Inventory.updatePart(index, modifiedInHouse);
+
+        if ((min > max) || (max > inventoryStock)) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setContentText("Min value cannot be higher than max!\nOr max value cannot be higher then inv!");
+            alert.showAndWait();
         } else {
-            outsourcedButtonClicked();
-            String companyName = modifyPartMachIdTxt.getText();
-            Outsourced modifiedOutsourced = new Outsourced(id, name, price, inventoryStock, min, max, companyName); 
-            Inventory.updatePart(index, modifiedOutsourced);
+            if (modifyPartInHouseRbtn.isSelected()) {
+                inHouseModifiedButtonClicked();
+                int machineId = Integer.parseInt(modifyPartMachIdTxt.getText());
+                InHouse modifiedInHouse = new InHouse(id, name, price, inventoryStock, min, max, machineId);
+                Inventory.updatePart(index, modifiedInHouse);
+            } else {
+                outsourcedButtonClicked();
+                String companyName = modifyPartMachIdTxt.getText();
+                Outsourced modifiedOutsourced = new Outsourced(id, name, price, inventoryStock, min, max, companyName);
+                Inventory.updatePart(index, modifiedOutsourced);
+            }
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setContentText("Please confirm you want to modify the selected part!");
+            Optional<ButtonType> choice = alert.showAndWait();
+
+            if (choice.get() == ButtonType.OK) {
+                stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
+                scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
+                stage.setScene(new Scene(scene));
+                stage.show();
+            }
         }
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setContentText("Please confirm you want to modify the selected part!");
-        Optional<ButtonType> choice = alert.showAndWait();
-        
-        if(choice.get() == ButtonType.OK){
-            stage = (Stage)((Button)event.getSource()).getScene().getWindow();
-            scene = FXMLLoader.load(getClass().getResource("/view/MainScreen.fxml"));
-            stage.setScene(new Scene(scene));
-            stage.show();
-        }
+
     }
+
     /*
      The fallowing methods accept a part to initialize a view 
      */
-    public void initDataInHouse(InHouse part){
+    public void initDataInHouse(InHouse part) {
         selectedInHousePart = part;
         modifyPartIdTxt.setText(Integer.toString(selectedInHousePart.getPartId()));
         modifyPartNameTxt.setText(selectedInHousePart.getPartName());
@@ -146,8 +151,8 @@ public class ModifyPartController implements Initializable {
         modifyPartInHouseRbtn.setSelected(true);
         modifyPartIdTxt.setDisable(true);
     }
-    
-    public void initDataOutsourced(Outsourced part){
+
+    public void initDataOutsourced(Outsourced part) {
         selectedOutsourcedPart = part;
         modifyPartIdTxt.setText(Integer.toString(selectedOutsourcedPart.getPartId()));
         modifyPartNameTxt.setText(selectedOutsourcedPart.getPartName());
@@ -159,14 +164,14 @@ public class ModifyPartController implements Initializable {
         modifyMachIdCompNameLbl.setText("Company Name");
         modifyPartOutsourcedRbtn.setSelected(true);
         modifyPartIdTxt.setDisable(true);
-        
+
     }
-    
-    public void inHouseModifiedButtonClicked(){
+
+    public void inHouseModifiedButtonClicked() {
         modifyMachIdCompNameLbl.setText("Machine ID");
     }
-    
-    public void outsourcedButtonClicked(){
+
+    public void outsourcedButtonClicked() {
         modifyMachIdCompNameLbl.setText("Company Name");
     }
 
@@ -176,7 +181,7 @@ public class ModifyPartController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-        
-    }    
-    
+
+    }
+
 }

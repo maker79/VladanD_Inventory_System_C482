@@ -50,14 +50,16 @@ public class Inventory {
         }
         return null;
     }
+
     
     // This method will loop through observable list and look up Parts by Name
     public static ObservableList<Part> lookupPart(String partName){
-        lookedupParts.clear();
         
-        for(int p = 0; p < allParts.size(); p++){
-            if(allParts.get(p).getPartName().toLowerCase().equals(partName.toLowerCase())){
-                lookedupParts.add(allParts.get(p));
+        for(int i = 0; i < allParts.size(); i++){
+            Part p = allParts.get(i);
+            
+            if(p.getPartName().contains(partName)){
+                lookedupParts.add(p);
             }
         }
         return lookedupParts;   
@@ -65,9 +67,12 @@ public class Inventory {
     
     // This method will loop through observable list and look up Products by Name
     public static ObservableList<Product> lookupProduct(String productName){
-        for(int r = 0; r < allProducts.size(); r++){
-            if(allProducts.get(r).getProductName().toLowerCase().equals(productName.toLowerCase())){
-                lookedupProducts.add(allProducts.get(r));
+        
+        for(int i = 0; i < allProducts.size(); i++){
+            Product pr = allProducts.get(i);
+            
+            if(pr.getProductName().contains(productName)){
+                lookedupProducts.add(pr);
             }
         }
         return lookedupProducts;
